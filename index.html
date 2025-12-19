@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周易六爻算卦</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary-dark: #2D3748;
+            --primary-light: #4A5568;
+            --accent-gold: #D69E2E;
+            --accent-red: #E53E3E;
+            --bg-light: #F7FAFC;
+            --bg-paper: #FAF7F0;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: var(--bg-light);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(206, 181, 122, 0.05) 0%, rgba(206, 181, 122, 0) 90%),
+                radial-gradient(circle at 90% 80%, rgba(139, 69, 19, 0.05) 0%, rgba(139, 69, 19, 0) 90%);
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .hexagram-animation {
+            animation: fadeInScale 0.8s ease-out forwards;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .yao-line {
+            transition: all 0.3s ease;
+        }
+        
+        .yao-line:hover {
+            background-color: rgba(214, 158, 46, 0.1);
+        }
+        
+        .shake-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .ancient-paper {
+            background-color: var(--bg-paper);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                inset 0 0 10px rgba(139, 69, 19, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">周易六爻算卦</h1>
+            <p class="text-lg text-gray-600">数字起卦，探寻天机</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-8">
+            <!-- Step 1: Question Input -->
+            <section id="step-question" class="ancient-paper rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i data-lucide="message-circle" class="w-6 h-6 mr-2 text-amber-600"></i>
+                    请输入您的问题
+                </h2>
+                <p class="text-gray-600 mb-4">请清晰、具体地描述您想要咨询的问题，以便获得更准确的卦象解读。</p>
+                <textarea 
+                    id="question-input" 
+                    class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                    rows="4"
+                    placeholder="例如：我近期的事业发展如何？"></textarea>
+                <button 
+                    id="next-to-number" 
+                    class="mt-4 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center w-full md:w-auto"
+                >
+                    <span>下一步：输入数字起卦</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+                </button>
+            </section>
+
+            <!-- Step 2: Number Input -->
+            <section id="step-number" class="ancient-paper rounded-lg p-6 md:p-8 hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i data-lucide="calculator" class="w-6 h-6 mr-2 text-amber-600"></i>
+                    数字起卦
+                </h2>
+                <p class="text-gray-600 mb-6">请输入三个三位数，每一位数字代表一个爻位。数字将自动转换为阴阳爻。</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">第一个三位数（下卦）</label>
+                        <input 
+                            type="number" 
+                            id="number-1" 
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                            placeholder="例如：123"
+                            maxlength="3"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">第二个三位数（上卦）</label>
+                        <input 
+                            type="number" 
+                            id="number-2" 
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                            placeholder="例如：456"
+                            maxlength="3"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">第三个三位数（动爻）</label>
+                        <input 
+                            type="number" 
+                            id="number-3" 
+                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                            placeholder="例如：789"
+                            maxlength="3"
+                        >
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 mt-6">
+                    <button 
+                        id="back-to-question" 
+                        class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex-1"
+                    >
+                        返回
+                    </button>
+                    <button 
+                        id="calculate-hexagram" 
+                        class="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex-1"
+                    >
+                        起卦
+                    </button>
+                </div>
+            </section>
+
+            <!-- Step 3: Result -->
+            <section id="step-result" class="hidden">
+                <!-- Hexagram Display -->
+                <div class="ancient-paper rounded-lg p-6 md:p-8 mb-6 hexagram-animation">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">卦象结果</h2>
+                    
+                    <div class="flex justify-center mb-8">
+                        <div id="hexagram-display" class="space-y-1">
+                            <!-- Yao lines will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="text-center space-y-2">
+                        <h3 id="hexagram-name" class="text-2xl font-bold text-gray-800"></h3>
+                        <p id="hexagram-nature" class="text-gray-600"></p>
+                    </div>
+                </div>
+
+                <!-- Interpretation -->
+                <div class="ancient-paper rounded-lg p-6 md:p-8 hexagram-animation" style="animation-delay: 0.2s;">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i data-lucide="book-open" class="w-6 h-6 mr-2 text-amber-600"></i>
+                        卦象解读
+                    </h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">您的问题：</h3>
+                        <p id="user-question" class="text-gray-600"></p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">总体解读：</h3>
+                            <p id="general-interpretation" class="text-gray-600 leading-relaxed"></p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">变卦信息：</h3>
+                            <p id="changing-info" class="text-gray-600 leading-relaxed"></p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">应对建议：</h3>
+                            <p id="suggestions" class="text-gray-600 leading-relaxed"></p>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        id="restart" 
+                        class="mt-8 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors w-full md:w-auto"
+                    >
+                        重新起卦
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // Data
+            const hexagrams = {
+            "000000": { 
+                name: "坤", 
+                nature: "地", 
+                interpretation: "坤为地，六爻皆阴，象征大地的柔顺与厚德载物。坤卦代表静止、包容、顺从，犹如大地般默默承载万物而不居功。此卦主静，宜守不宜进，阴柔之气浓厚，强调以柔克刚、以静制动的智慧。", 
+                detailedInterpretation: "坤卦是《周易》六十四卦的第二卦，上坤下坤，纯阴之象。大地孕育万物，包容一切，象征着柔顺、宽容、奉献的精神。在人生中，此卦提示我们要像大地一样谦逊包容，以柔克刚，不要急于求成，而是要厚积薄发，等待时机。坤卦也代表母性、女性的力量，强调阴柔之美与包容的智慧。",
+                suggestions: "当以柔顺之道处世，学习大地的包容与隐忍。在事业上，宜守成不宜冒进，注重积累与沉淀；在人际关系中，要广结善缘，以和为贵；在家庭中，要扮演好支持与包容的角色。此时应耐心等待时机，不可强行出头，待条件成熟时自然会有发展的机会。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，坤卦提示你当前宜稳不宜进，应像大地一样默默耕耘，积累经验与人脉。不要急于求成，而是要耐心等待时机，厚积薄发。此时最适合做基础工作，打牢根基，为未来的发展做好准备。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，坤卦象征柔顺与包容。如果你是女性，提示你要发挥温柔体贴的优势；如果你是男性，提示你要寻找一位温柔贤淑的伴侣。当前感情宜静不宜动，应注重培养与维护现有的关系，而不是急于追求新的感情。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，坤卦提示你当前财运平稳，不宜进行高风险投资。应像大地一样踏实积累财富，通过辛勤劳动获得稳定的收入。此时适合储蓄与保守型投资，不要贪心冒进，以免破财。"
+                    } else {
+                        return "坤卦提示你当前宜以柔顺之道应对一切，保持平和的心态，不要急于求成。无论是学习、生活还是其他方面，都应注重积累与沉淀，耐心等待时机的到来。"
+                    }
+                }
+            },
+            "000001": { 
+                name: "剥", 
+                nature: "山地", 
+                interpretation: "剥卦象征山附于地，阴盛阳衰，小人道长。五阴爻在下，一阳爻在上，阴柔之气逐渐剥蚀阳刚之气，犹如山体逐渐侵蚀大地。此卦主凶，提示我们要警惕小人的谗言，坚守正道。", 
+                detailedInterpretation: "剥卦是《周易》第二十三卦，上艮下坤，山在地之上。山虽高大，但依附于地，象征着权势虽盛，但根基不稳。五阴爻剥蚀一阳爻，代表小人势力强大，君子处境艰难。在历史上，许多朝代的末期都出现过类似的情况，小人当道，君子退隐。剥卦提醒我们要认识到当前的形势，采取正确的应对策略。",
+                suggestions: "面对剥卦的不利形势，首先要坚守正道，不与小人同流合污。其次要保持低调，避免锋芒毕露，以免成为小人攻击的目标。同时要团结志同道合的人，形成一股可以抗衡小人的力量。最重要的是要保持耐心，等待时机，因为剥卦之后就是复卦，象征着阳气的回归。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，剥卦提示当前公司或单位小人当道，你的才能可能无法得到充分发挥。此时应保持低调，不要与小人正面冲突，而是要坚守自己的原则，做好本职工作。同时要寻找志同道合的同事，形成同盟，共同应对困难。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，剥卦提示当前感情关系中可能存在第三者或小人挑拨。你需要警惕身边的人，不要轻易相信别人的谗言。同时要加强与伴侣的沟通，增进彼此的信任，共同抵御外界的干扰。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，剥卦提示当前财运不佳，可能会有破财的风险。应避免进行高风险投资，谨慎处理财务问题。同时要警惕小人的诈骗行为，不要轻易相信别人的投资建议。"
+                    } else {
+                        return "剥卦提示当前你所处的环境小人较多，形势对你不利。应保持警惕，坚守正道，不被外界的诱惑所迷惑。同时要保持耐心，等待形势好转。"
+                    }
+                }
+            },
+            "000010": { 
+                name: "比", 
+                nature: "水地", 
+                interpretation: "比卦象征地上有水，亲比和谐。水在地上流动，滋润万物，象征着人与人之间的亲密关系与和谐共处。此卦主吉，提示我们要广结善缘，团结协作。", 
+                detailedInterpretation: "比卦是《周易》第八卦，上坎下坤，水在地之上。水与地相互依存，象征着君臣同心、上下相亲。在古代，比卦常被用来象征君臣关系，君主如地，臣子如水，水滋润大地，大地承载水。在现代社会，比卦可以引申为团队合作、人际关系等方面。比卦强调和谐共处、相互依存的重要性。",
+                suggestions: "比卦提示我们要重视人际关系的建立与维护。在事业上，要与同事、上司建立良好的关系，团结协作，共同完成任务；在生活中，要与家人、朋友保持亲密的联系，互相帮助，共同成长。同时要注意选择志同道合的人作为朋友，避免与品德不良的人交往。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，比卦提示当前是建立良好人际关系的好时机。你应该主动与同事、上司沟通交流，表达自己的想法与观点，同时也要倾听别人的意见。通过团结协作，你将能够更好地完成工作任务，获得事业上的成功。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，比卦象征亲密与和谐。如果你目前单身，提示你可能会遇到一位与你志同道合的伴侣；如果你已有伴侣，提示你们的关系将更加亲密和谐。此时应加强与伴侣的沟通，增进彼此的了解与信任。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，比卦提示通过与人合作，你将能够获得更好的财运。可以考虑与朋友或同事共同投资，或者寻求别人的帮助与支持。同时要注意与合作伙伴保持良好的关系，避免因利益分配问题产生矛盾。"
+                    } else {
+                        return "比卦提示当前是广结善缘的好时机。无论是学习、工作还是生活，都应积极与他人建立良好的关系，互相帮助，共同进步。通过团结协作，你将能够更好地实现自己的目标。"
+                    }
+                }
+            },
+            "111111": { 
+                name: "乾", 
+                nature: "天", 
+                interpretation: "乾为天，六爻皆阳，象征天空的刚健与中正。乾卦代表运动、进取、刚强，犹如天空般刚健不息，运行不止。此卦主吉，提示我们要自强不息，勇往直前。", 
+                detailedInterpretation: "乾卦是《周易》六十四卦的第一卦，上乾下乾，纯阳之象。天空刚健不息，运行不止，象征着积极进取、自强不息的精神。在人生中，此卦提示我们要像天空一样刚健中正，不断努力，勇往直前，追求卓越。乾卦也代表父性、男性的力量，强调阳刚之美与进取的精神。",
+                suggestions: "当以刚健之道处世，学习天空的自强不息与勇往直前。在事业上，要积极进取，勇于创新，不断超越自我；在人际关系中，要保持中正之道，光明磊落；在家庭中，要扮演好保护与支持的角色。此时应抓住机会，大胆行动，发挥自己的才能与潜力。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，乾卦提示你当前运势旺盛，正是大展宏图的好时机。你应该积极进取，勇于创新，不断挑战自我，追求卓越。此时适合开展新项目、拓展新业务，或者寻求晋升机会。只要你保持刚健中正的态度，努力奋斗，必将取得事业上的成功。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，乾卦象征阳刚与进取。如果你是男性，提示你要主动追求自己的幸福；如果你是女性，提示你要寻找一位刚健有为的伴侣。当前感情运势良好，适合表白、求婚或举办婚礼等重要仪式。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，乾卦提示你当前财运亨通，适合进行投资与理财。可以考虑一些有潜力的项目，大胆投资，相信会有不错的回报。但要注意保持理性，不要贪心冒进，避免投资过高风险的项目。"
+                    } else {
+                        return "乾卦提示你当前运势旺盛，正是积极进取的好时机。无论是学习、生活还是其他方面，都应保持刚健中正的态度，勇往直前，不断超越自我。只要你努力奋斗，必将取得成功。"
+                    }
+                }
+            },
+            "111000": { 
+                name: "泰", 
+                nature: "地天", 
+                interpretation: "泰卦象征天地交泰，万物亨通。上地下天，阴阳相交，象征着和谐与通顺。此卦主吉，提示我们当前运势良好，事事顺利，是发展的好时机。", 
+                detailedInterpretation: "泰卦是《周易》第十一卦，上坤下乾，地天相交。天地之气相互交通，万物得以生长发育，象征着和谐、通顺、繁荣。在人生中，此卦提示我们当前处于一个非常有利的时期，各种条件都已具备，正是大展宏图的好时机。泰卦也代表着上下和谐、君臣同心，是一个非常吉祥的卦象。",
+                suggestions: "泰卦提示我们要抓住当前的有利时机，积极行动，努力发展。在事业上，要大胆创新，拓展业务，寻求更大的发展空间；在人际关系中，要保持和谐与团结，与他人建立良好的合作关系；在家庭中，要营造温馨和谐的氛围，增进家人之间的感情。同时要注意保持谦虚谨慎的态度，不要骄傲自满，以免乐极生悲。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，泰卦提示你当前事业运势亨通，正是大展宏图的好时机。你应该抓住机会，大胆创新，拓展业务，寻求更大的发展空间。此时适合与他人合作，共同开发新项目，或者寻求晋升机会。只要你努力奋斗，必将取得事业上的成功。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，泰卦象征和谐与美满。如果你目前单身，提示你可能会遇到一位与你非常般配的伴侣；如果你已有伴侣，提示你们的关系将更加和谐美满。此时适合谈婚论嫁，或者计划未来的生活。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，泰卦提示你当前财运亨通，适合进行投资与理财。可以考虑一些稳健的投资项目，相信会有不错的回报。同时要注意合理规划财务，不要铺张浪费，以免影响未来的财运。"
+                    } else {
+                        return "泰卦提示你当前运势良好，事事顺利。无论是学习、工作还是生活，都应抓住有利时机，积极行动，努力发展。同时要保持谦虚谨慎的态度，不要骄傲自满，以免影响未来的发展。"
+                    }
+                }
+            },
+            "000111": { 
+                name: "否", 
+                nature: "天地", 
+                interpretation: "否卦象征天地不交，否塞不通。上天下地，阴阳不相交，象征着闭塞与不通顺。此卦主凶，提示我们当前运势不佳，事事不顺，需要谨慎应对。", 
+                detailedInterpretation: "否卦是《周易》第十二卦，上乾下坤，天地不交。天地之气相互隔绝，万物无法生长发育，象征着闭塞、不通、困境。在人生中，此卦提示我们当前处于一个非常不利的时期，各种条件都不具备，需要谨慎应对。否卦也代表着上下离心、君臣不和，是一个比较凶险的卦象。",
+                suggestions: "否卦提示我们要面对现实，谨慎应对当前的困境。在事业上，要保持低调，不要冒险行事，而是要守成待机；在人际关系中，要注意与他人的沟通与交流，避免产生误解与矛盾；在家庭中，要关心家人的感受，营造和谐的氛围。同时要保持乐观的心态，相信否极泰来，困境终会过去。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，否卦提示你当前事业运势不佳，可能会遇到各种困难与挑战。你应该保持低调，不要冒险行事，而是要守成待机，等待时机的好转。此时适合做好本职工作，积累经验与资源，为未来的发展做好准备。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，否卦象征隔阂与矛盾。如果你目前单身，提示你可能会遇到一些感情上的挫折；如果你已有伴侣，提示你们的关系可能会出现一些矛盾与分歧。此时应加强与伴侣的沟通，增进彼此的了解与信任，共同解决问题。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，否卦提示你当前财运不佳，可能会遇到一些经济上的困难。应避免进行高风险投资，谨慎处理财务问题。同时要注意节约开支，合理规划财务，度过当前的困难时期。"
+                    } else {
+                        return "否卦提示你当前运势不佳，事事不顺。无论是学习、工作还是生活，都应保持低调，谨慎应对。同时要保持乐观的心态，相信否极泰来，困境终会过去。";
+                    }
+                }
+            }
+        };
+
+        // DOM Elements
+        const stepQuestion = document.getElementById('step-question');
+        const stepNumber = document.getElementById('step-number');
+        const stepResult = document.getElementById('step-result');
+        
+        const questionInput = document.getElementById('question-input');
+        const number1Input = document.getElementById('number-1');
+        const number2Input = document.getElementById('number-2');
+        const number3Input = document.getElementById('number-3');
+        
+        const nextToNumberBtn = document.getElementById('next-to-number');
+        const backToQuestionBtn = document.getElementById('back-to-question');
+        const calculateHexagramBtn = document.getElementById('calculate-hexagram');
+        const restartBtn = document.getElementById('restart');
+        
+        const hexagramDisplay = document.getElementById('hexagram-display');
+        const hexagramName = document.getElementById('hexagram-name');
+        const hexagramNature = document.getElementById('hexagram-nature');
+        const userQuestion = document.getElementById('user-question');
+        const generalInterpretation = document.getElementById('general-interpretation');
+        const changingInfo = document.getElementById('changing-info');
+        const suggestions = document.getElementById('suggestions');
+
+        // Event Listeners
+        nextToNumberBtn.addEventListener('click', () => {
+            if (questionInput.value.trim() === '') {
+                questionInput.classList.add('shake-animation', 'border-red-500');
+                setTimeout(() => {
+                    questionInput.classList.remove('shake-animation', 'border-red-500');
+                }, 500);
+                return;
+            }
+            stepQuestion.classList.add('hidden');
+            stepNumber.classList.remove('hidden');
+        });
+        
+        backToQuestionBtn.addEventListener('click', () => {
+            stepNumber.classList.add('hidden');
+            stepQuestion.classList.remove('hidden');
+        });
+        
+        calculateHexagramBtn.addEventListener('click', calculateHexagram);
+        restartBtn.addEventListener('click', restart);
+
+        // Functions
+        function calculateHexagram() {
+            const num1 = number1Input.value.trim();
+            const num2 = number2Input.value.trim();
+            const num3 = number3Input.value.trim();
+            
+            if (!validateNumberInput(num1) || !validateNumberInput(num2) || !validateNumberInput(num3)) {
+                const invalidInput = !validateNumberInput(num1) ? number1Input : 
+                                    !validateNumberInput(num2) ? number2Input : number3Input;
+                invalidInput.classList.add('shake-animation', 'border-red-500');
+                setTimeout(() => {
+                    invalidInput.classList.remove('shake-animation', 'border-red-500');
+                }, 500);
+                return;
+            }
+            
+            const lowerTrigram = generateTrigram(num1);
+            const upperTrigram = generateTrigram(num2);
+            const changingLines = generateChangingLines(num3);
+            
+            const originalHexagram = upperTrigram + lowerTrigram;
+            const changedHexagram = generateChangedHexagram(originalHexagram, changingLines);
+            
+            displayResult(originalHexagram, changedHexagram, changingLines);
+            
+            stepNumber.classList.add('hidden');
+            stepResult.classList.remove('hidden');
+        }
+        
+        function validateNumberInput(num) {
+            return num.length === 3 && !isNaN(num);
+        }
+        
+        function generateTrigram(num) {
+            // 传统起卦法：每个数字除以2，取余数（0为阴，1为阳）
+            let trigram = '';
+            for (let i = 0; i < 3; i++) {
+                const digit = parseInt(num[i]);
+                trigram = (digit % 2 === 0 ? '0' : '1') + trigram;
+            }
+            return trigram;
+        }
+        
+        function generateChangingLines(num) {
+            // 传统起卦法：数字之和除以6，余数为动爻位置（余数0表示6爻）
+            const digits = num.split('').map(d => parseInt(d));
+            const sum = digits.reduce((acc, curr) => acc + curr, 0);
+            const remainder = sum % 6;
+            
+            const changingLines = [];
+            if (remainder !== 0) {
+                changingLines.push(6 - remainder); // 转换为0-5的索引（0为上爻，5为初爻）
+            } else {
+                changingLines.push(0); // 余数为0，动爻为6爻（上爻，索引0）
+            }
+            
+            return changingLines;
+        }
+        
+        function generateChangedHexagram(original, changingLines) {
+            let changed = original.split('');
+            changingLines.forEach(line => {
+                changed[line] = changed[line] === '0' ? '1' : '0';
+            });
+            return changed.join('');
+        }
+        
+        function displayResult(originalHexagram, changedHexagram, changingLines) {
+            // Display hexagram
+            hexagramDisplay.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const isChanging = changingLines.includes(i);
+                const isYang = originalHexagram[i] === '1';
+                
+                const yaoLine = document.createElement('div');
+                yaoLine.className = `yao-line flex items-center justify-center py-2 px-4 rounded ${isChanging ? 'bg-amber-100 border border-amber-300' : ''}`;
+                
+                if (isYang) {
+                    yaoLine.innerHTML = `<div class="w-16 h-1 bg-gray-800 ${isChanging ? 'relative' : ''}">${isChanging ? '<div class="absolute w-1 h-1 bg-amber-600 rounded-full -top-1 left-1/2 transform -translate-x-1/2"></div><div class="absolute w-1 h-1 bg-amber-600 rounded-full -bottom-1 left-1/2 transform -translate-x-1/2"></div>' : ''}</div>`;
+                } else {
+                    yaoLine.innerHTML = `<div class="w-16 h-1 bg-transparent border-t border-b border-gray-800 ${isChanging ? 'relative' : ''}">${isChanging ? '<div class="absolute w-1 h-1 bg-amber-600 rounded-full -top-1 left-1/2 transform -translate-x-1/2"></div><div class="absolute w-1 h-1 bg-amber-600 rounded-full -bottom-1 left-1/2 transform -translate-x-1/2"></div>' : ''}</div>`;
+                }
+                
+                hexagramDisplay.appendChild(yaoLine);
+            }
+            
+            // Display hexagram info
+            const originalInfo = hexagrams[originalHexagram] || {
+                name: "未知卦",
+                nature: "未知",
+                interpretation: "暂无解读",
+                detailedInterpretation: "暂无详细解读",
+                suggestions: "暂无建议",
+                questionSpecific: function() { return "暂无针对该问题的具体解读"; }
+            };
+            const changedInfo = hexagrams[changedHexagram] || {
+                name: "未知卦",
+                nature: "未知",
+                interpretation: "暂无解读"
+            };
+            
+            hexagramName.textContent = originalInfo.name;
+            hexagramNature.textContent = originalInfo.nature;
+            userQuestion.textContent = questionInput.value.trim();
+            
+            // Display detailed interpretation
+            let detailedText = originalInfo.interpretation;
+            if (originalInfo.detailedInterpretation) {
+                detailedText += "\n" + originalInfo.detailedInterpretation;
+            }
+            generalInterpretation.textContent = detailedText;
+            
+            if (changingLines.length > 0) {
+                changingInfo.textContent = `动爻为：${changingLines.map(line => 6 - line).join('、')}爻。变卦为${changedInfo.name}（${changedInfo.nature}）。${changedInfo.interpretation}`;
+            } else {
+                changingInfo.textContent = '无动爻，卦象稳定。';
+            }
+            
+            // Display comprehensive suggestions
+            let suggestionsText = originalInfo.suggestions;
+            if (originalInfo.questionSpecific) {
+                suggestionsText += "\n\n针对您的问题：" + originalInfo.questionSpecific(questionInput.value.trim());
+            }
+            suggestions.textContent = suggestionsText;
+        }
+        
+        function restart() {
+            questionInput.value = '';
+            number1Input.value = '';
+            number2Input.value = '';
+            number3Input.value = '';
+            
+            stepResult.classList.add('hidden');
+            stepQuestion.classList.remove('hidden');
+        }
+    });
+    </script>
+</body>
+</html>
