@@ -114,37 +114,43 @@
                     <i data-lucide="calculator" class="w-6 h-6 mr-2 text-amber-600"></i>
                     数字起卦
                 </h2>
-                <p class="text-gray-600 mb-6">请输入三个三位数，每一位数字代表一个爻位。数字将自动转换为阴阳爻。</p>
+                <p class="text-gray-600 mb-6">心中默念所问之事，随意报出三个1-9的数字。</p>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">第一个三位数（下卦）</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">第一个数字（上卦）：1-9之间</label>
                         <input 
                             type="number" 
                             id="number-1" 
                             class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                            placeholder="例如：123"
-                            maxlength="3"
+                            placeholder="例如：1"
+                            min="1"
+                            max="9"
+                            maxlength="1"
                         >
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">第二个三位数（上卦）</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">第二个数字（下卦）：1-9之间</label>
                         <input 
                             type="number" 
                             id="number-2" 
                             class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                            placeholder="例如：456"
-                            maxlength="3"
+                            placeholder="例如：2"
+                            min="1"
+                            max="9"
+                            maxlength="1"
                         >
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">第三个三位数（动爻）</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">第三个数字（动爻）：1-9之间</label>
                         <input 
                             type="number" 
                             id="number-3" 
                             class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                            placeholder="例如：789"
-                            maxlength="3"
+                            placeholder="例如：3"
+                            min="1"
+                            max="9"
+                            maxlength="1"
                         >
                     </div>
                 </div>
@@ -245,6 +251,24 @@
                         return "财运方面，坤卦提示你当前财运平稳，不宜进行高风险投资。应像大地一样踏实积累财富，通过辛勤劳动获得稳定的收入。此时适合储蓄与保守型投资，不要贪心冒进，以免破财。"
                     } else {
                         return "坤卦提示你当前宜以柔顺之道应对一切，保持平和的心态，不要急于求成。无论是学习、生活还是其他方面，都应注重积累与沉淀，耐心等待时机的到来。"
+                    }
+                }
+            },
+            "010101": { 
+                name: "既济", 
+                nature: "水火", 
+                interpretation: "既济卦象征水在火上，阴阳调和，事成之象。此卦表示事情已经成功或即将成功，是一个吉祥的卦象。但也提示我们要居安思危，因为成功之后容易产生懈怠。", 
+                detailedInterpretation: "既济卦是《周易》第六十三卦，上坎下离，水在火上。水可以灭火，火可以煮水，象征着阴阳调和、刚柔相济的和谐状态。在人生中，此卦提示我们当前处于一个成功或即将成功的阶段，各种条件都已具备，事情进展顺利。但也警示我们要保持警惕，不要因为成功而骄傲自满，否则可能会导致失败。",
+                suggestions: "既济卦提示我们要珍惜当前的成功，同时保持警惕，居安思危。在事业上，要继续努力，巩固已有的成果，不要松懈；在人际关系中，要保持谦虚谨慎的态度，不要因为成功而疏远他人；在家庭中，要珍惜幸福的生活，用心维护家庭关系。此时应保持清醒的头脑，避免因骄傲自满而导致失败。",
+                questionSpecific: function(question) {
+                    if (question.includes('事业') || question.includes('工作')) {
+                        return "事业方面，既济卦提示你当前事业发展顺利，已经取得了一定的成功或即将成功。你应该珍惜这来之不易的成果，继续努力，巩固已有的地位。同时要保持谦虚谨慎的态度，不要因为成功而骄傲自满，否则可能会导致事业下滑。此时适合总结经验，为下一步的发展做好准备。"
+                    } else if (question.includes('感情') || question.includes('婚姻')) {
+                        return "感情方面，既济卦象征阴阳调和，感情和谐。如果你已有伴侣，提示你们的感情非常稳定，已经进入了一个和谐美满的阶段；如果你目前单身，提示你可能会遇到一位与你非常般配的伴侣。此时应珍惜感情，用心维护，避免因骄傲自满而破坏和谐。"
+                    } else if (question.includes('财运') || question.includes('财富')) {
+                        return "财运方面，既济卦提示你当前财运亨通，已经获得了一定的财富或即将获得财富。你应该珍惜这来之不易的财运，合理规划财务，不要挥霍无度。此时适合进行稳健的投资，巩固已有的财富，避免因贪心冒进而导致破财。"
+                    } else {
+                        return "既济卦提示你当前处于一个成功或即将成功的阶段，各种事情都进展顺利。你应该珍惜这来之不易的成果，保持谦虚谨慎的态度，继续努力，为未来的发展做好准备。同时要居安思危，避免因骄傲自满而导致失败。"
                     }
                 }
             },
@@ -385,6 +409,7 @@
         restartBtn.addEventListener('click', restart);
 
         // Functions
+        
         function calculateHexagram() {
             const num1 = number1Input.value.trim();
             const num2 = number2Input.value.trim();
@@ -400,8 +425,8 @@
                 return;
             }
             
-            const lowerTrigram = generateTrigram(num1);
-            const upperTrigram = generateTrigram(num2);
+            const upperTrigram = generateTrigram(num1); // 第一个数字对应上卦
+            const lowerTrigram = generateTrigram(num2); // 第二个数字对应下卦
             const changingLines = generateChangingLines(num3);
             
             const originalHexagram = upperTrigram + lowerTrigram;
@@ -414,31 +439,38 @@
         }
         
         function validateNumberInput(num) {
-            return num.length === 3 && !isNaN(num);
+            // 确保num是字符串类型
+            num = num.toString();
+            return num.length === 1 && !isNaN(num) && parseInt(num) >= 1 && parseInt(num) <= 9;
         }
         
         function generateTrigram(num) {
-            // 传统起卦法：每个数字除以2，取余数（0为阴，1为阳）
-            let trigram = '';
-            for (let i = 0; i < 3; i++) {
-                const digit = parseInt(num[i]);
-                trigram = (digit % 2 === 0 ? '0' : '1') + trigram;
-            }
-            return trigram;
+            // 根据数字生成对应的卦象（1-8分别对应乾、兑、离、震、巽、坎、艮、坤）
+            num = parseInt(num);
+            const remainder = num % 8 || 8; // 余数为0时对应8（坤卦）
+            
+            // 八卦映射表：1乾、2兑、3离、4震、5巽、6坎、7艮、8坤
+            const trigramMap = {
+                1: '111', // 乾
+                2: '110', // 兑
+                3: '101', // 离
+                4: '100', // 震
+                5: '011', // 巽
+                6: '010', // 坎
+                7: '001', // 艮
+                8: '000'  // 坤
+            };
+            
+            return trigramMap[remainder];
         }
         
         function generateChangingLines(num) {
-            // 传统起卦法：数字之和除以6，余数为动爻位置（余数0表示6爻）
-            const digits = num.split('').map(d => parseInt(d));
-            const sum = digits.reduce((acc, curr) => acc + curr, 0);
-            const remainder = sum % 6;
+            // 第三个数字除6取余数确定动爻位置（1-6爻，余数0对应6爻）
+            num = parseInt(num);
+            const remainder = num % 6 || 6; // 余数为0时对应6爻
             
             const changingLines = [];
-            if (remainder !== 0) {
-                changingLines.push(6 - remainder); // 转换为0-5的索引（0为上爻，5为初爻）
-            } else {
-                changingLines.push(0); // 余数为0，动爻为6爻（上爻，索引0）
-            }
+            changingLines.push(6 - remainder); // 转换为0-5的索引（0为上爻，5为初爻）
             
             return changingLines;
         }
